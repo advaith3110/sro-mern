@@ -1,0 +1,99 @@
+/* =========================
+   HARD RESET (CRITICAL)
+========================= */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* =========================
+   ROOT + BODY FIX (MAIN ISSUE SOLVER)
+========================= */
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  background: #020617;
+  /* 🔥 removes white edges */
+}
+
+/* 🚫 REMOVE DEFAULT VITE CENTERING */
+body {
+  display: block !important;
+  overflow-x: hidden;
+  font-family: "Poppins", "Inter", sans-serif;
+  color: #e2e8f0;
+}
+
+/* =========================
+   ROOT CONTAINER
+========================= */
+#root {
+  display: flex;
+}
+
+/* =========================
+   GLOBAL BACKGROUND (SMOOTH)
+========================= */
+body {
+  background: linear-gradient(135deg, #020617, #0f172a);
+}
+
+/* =========================
+   SCROLLBAR (PREMIUM LOOK)
+========================= */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #020617;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #334155;
+}
+
+/* =========================
+   REMOVE ANY HORIZONTAL OVERFLOW
+========================= */
+body,
+html {
+  overflow-x: hidden;
+}
+
+/* =========================
+   IMAGE / CANVAS SAFETY
+========================= */
+img,
+canvas {
+  max-width: 100%;
+  display: block;
+}
+
+/* =========================
+   BUTTON RESET (PREVENT DEFAULT WHITE BUTTONS)
+========================= */
+button {
+  border: none;
+  outline: none;
+  background: none;
+  font-family: inherit;
+}
+
+/* =========================
+   LINK RESET
+========================= */
+a {
+  text-decoration: none;
+  color: inherit;
+}
