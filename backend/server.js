@@ -17,8 +17,15 @@ app.use(
 
 app.use(express.json());
 
+// ✅ ROOT ROUTE (ADD THIS)
+app.get("/", (req, res) => {
+  res.send("SRO-MERN Backend is Live 🚀");
+});
+
 // Routes
 app.use("/api/graph", graphRoutes);
+
+
 
 // MongoDB Connection
 mongoose
