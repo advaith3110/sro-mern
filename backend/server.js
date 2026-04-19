@@ -20,24 +20,28 @@ app.use(
 app.use(express.json());
 
 /* =========================
-   ROOT ROUTE (HEALTH CHECK)
+   ROOT ROUTE
 ========================= */
 app.get("/", (req, res) => {
   res.send("SRO-MERN Backend API is running 🚀");
 });
 
 /* =========================
-   API ROUTES
+   ROUTES
 ========================= */
 app.use("/api/graph", graphRoutes);
 
 /* =========================
-   START SERVER ONLY AFTER DB CONNECTS
+   SERVER START
 ========================= */
 const PORT = process.env.PORT || 8080;
 
 const startServer = async () => {
   try {
+    // ✅ DEBUG FIRST
+    console.log("ENV CHECK:", process.env.MONGO_URI);
+
+    // ✅ THEN CONNECT
     await mongoose.connect(process.env.MONGO_URI);
 
     console.log("MongoDB Connected ✅");
