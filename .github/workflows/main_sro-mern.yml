@@ -11,46 +11,33 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: "22.x"
 
-      # ✅ Install backend dependencies
       - name: Install backend dependencies
         run: |
           cd backend
           npm install
 
-      # ✅ Install frontend dependencies + build
-      - name: Build frontend
-        run: |
-          cd client
-          npm install
-          npm run build
-
-      # ✅ Upload BOTH backend + frontend
-      - name: Upload full project
+      - name: Upload backend
         uses: actions/upload-artifact@v4
         with:
-          name: full-app
-          path: .
+          name: backend
+          path: backend
 
   deploy:
     runs-on: ubuntu-latest
     needs: build
 
     steps:
-      - name: Download full project
-        uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v4
         with:
-          name: full-app
+          name: backend
 
-      # ✅ Deploy everything (backend + client/dist)
-      - name: Deploy to Azure Web App
+      - name: Deploy to Azure
         uses: azure/webapps-deploy@v3
         with:
           app-name: "SRO-MERN"
