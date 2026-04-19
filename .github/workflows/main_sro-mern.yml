@@ -19,17 +19,17 @@ jobs:
         with:
           node-version: "22.x"
 
-      # ✅ FIX: go inside backend
-      - name: Install dependencies
+      # ✅ Install dependencies inside backend
+      - name: Install backend dependencies
         run: |
           cd backend
           npm install
 
-      # ✅ Upload only backend
-      - name: Upload artifact
+      # ✅ Upload ONLY backend folder
+      - name: Upload backend artifact
         uses: actions/upload-artifact@v4
         with:
-          name: node-app
+          name: backend-app
           path: backend
 
   deploy:
@@ -37,12 +37,12 @@ jobs:
     needs: build
 
     steps:
-      - name: Download artifact
+      - name: Download backend artifact
         uses: actions/download-artifact@v4
         with:
-          name: node-app
+          name: backend-app
 
-      # ✅ SIMPLE DEPLOY (no Azure login issues)
+      # ✅ Deploy backend as root
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
