@@ -1,12 +1,11 @@
 import { useState } from "react";
-import { AppContext } from "../context/appContext";
+import { AppContext } from "./AppContext";
 
-export const AppProvider = ({ children }) => {
+const AppProvider = ({ children }) => {
   const [nodes, setNodes] = useState([]);
   const [edges, setEdges] = useState([]);
   const [traffic, setTraffic] = useState(false);
   const [speed, setSpeed] = useState(500);
-  // ✅ CRITICAL FIX (for clear canvas issue)
   const [isCanvasCleared, setIsCanvasCleared] = useState(false);
 
   return (
@@ -20,7 +19,6 @@ export const AppProvider = ({ children }) => {
         setTraffic,
         speed,
         setSpeed,
-
         isCanvasCleared,
         setIsCanvasCleared,
       }}
@@ -29,3 +27,5 @@ export const AppProvider = ({ children }) => {
     </AppContext.Provider>
   );
 };
+
+export default AppProvider;

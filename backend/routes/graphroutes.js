@@ -4,32 +4,44 @@ import Graph from "../models/graph.js";
 const router = express.Router();
 
 /* =========================
-   ROOT CHECK (IMPORTANT)
+   ROOT CHECK
 ========================= */
 router.get("/", (req, res) => {
   res.json({ message: "Graph API is running 🚀" });
 });
 
 /* =========================
-   SAVE GRAPH
+   SAVE GRAPH (FIXED)
 ========================= */
 router.post("/save", async (req, res) => {
   try {
-    const { nodes, edges, name } = req.body;
+    console.log("📥 Incoming:", req.body);
+
+    const { nodes, edges } = req.body;
+
+    // ✅ VALIDATION (IMPORTANT)
+    if (!Array.isArray(nodes) || !Array.isArray(edges)) {
+      return res.status(400).json({
+        message: "Invalid data format",
+      });
+    }
 
     const newGraph = new Graph({
       nodes,
       edges,
-      name: name || "Untitled Graph",
     });
 
-    await newGraph.save();
+    const savedGraph = await newGraph.save();
+
+    console.log("✅ Saved:", savedGraph._id);
 
     res.status(201).json({
       message: "Graph saved successfully",
-      graph: newGraph,
+      graph: savedGraph,
     });
   } catch (error) {
+    console.error("❌ SAVE ERROR:", error.message);
+
     res.status(500).json({
       message: "Error saving graph",
       error: error.message,
@@ -58,7 +70,7 @@ router.get("/load", async (req, res) => {
 });
 
 /* =========================
-   RESET ALL GRAPHS
+   RESET
 ========================= */
 router.delete("/reset", async (req, res) => {
   try {
@@ -73,7 +85,7 @@ router.delete("/reset", async (req, res) => {
 });
 
 /* =========================
-   GET ALL GRAPHS
+   GET ALL
 ========================= */
 router.get("/all", async (req, res) => {
   try {
@@ -88,7 +100,7 @@ router.get("/all", async (req, res) => {
 });
 
 /* =========================
-   DELETE GRAPH BY ID
+   DELETE
 ========================= */
 router.delete("/:id", async (req, res) => {
   try {

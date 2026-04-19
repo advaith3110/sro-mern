@@ -1,7 +1,9 @@
 import { useState, useContext, useEffect } from "react";
 import axios from "axios";
 import Node from "./Node";
-import { AppContext } from "../context/appContext";
+import { AppContext } from "../context/AppContext";
+
+const API = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 function GraphCanvas() {
   const { nodes, setNodes, edges, setEdges, traffic } = useContext(AppContext);
@@ -26,13 +28,12 @@ function GraphCanvas() {
     return label;
   };
 
-  /* ========================= LOAD ONLY ON FIRST VISIT ========================= */
+  /* ========================= LOAD ========================= */
   useEffect(() => {
     const loadGraph = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/graph/load");
+        const res = await axios.get(`${API}/api/graph/load`);
 
-        // ✅ Only load if nothing exists in UI (prevents reload after clear)
         if (nodes.length === 0 && edges.length === 0) {
           setNodes(res.data.nodes || []);
           setEdges(res.data.edges || []);
@@ -47,10 +48,10 @@ function GraphCanvas() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  /* ========================= SAVE GRAPH (NEW ENTRY) ========================= */
+  /* ========================= SAVE ========================= */
   const saveGraph = async () => {
     try {
-      await axios.post("http://localhost:5000/api/graph/save", {
+      await axios.post(`${API}/api/graph/save`, {
         nodes,
         edges,
       });
@@ -62,7 +63,7 @@ function GraphCanvas() {
     }
   };
 
-  /* ========================= CLEAR UI ONLY ========================= */
+  /* ========================= CLEAR ========================= */
   const clearCanvas = () => {
     setNodes([]);
     setEdges([]);
@@ -109,7 +110,6 @@ function GraphCanvas() {
 
         let t = 0;
 
-        // ✅ TRAFFIC LOGIC (FIXED)
         if (traffic) {
           const trafficInput = prompt(
             "Enter Traffic Level (0 = no traffic, 5 = heavy)",

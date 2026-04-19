@@ -4,40 +4,19 @@ import mongoose from "mongoose";
    NODE SCHEMA
 ========================= */
 const nodeSchema = new mongoose.Schema({
-  id: {
-    type: Number, // ✅ must match frontend (0,1,2...)
-    required: true,
-  },
-  x: {
-    type: Number,
-    required: true,
-  },
-  y: {
-    type: Number,
-    required: true,
-  },
+  id: { type: Number, required: true },
+  x: { type: Number, required: true },
+  y: { type: Number, required: true },
 });
 
 /* =========================
    EDGE SCHEMA
 ========================= */
 const edgeSchema = new mongoose.Schema({
-  from: {
-    type: Number, // ✅ matches frontend
-    required: true,
-  },
-  to: {
-    type: Number, // ✅ matches frontend
-    required: true,
-  },
-  distance: {
-    type: Number,
-    required: true,
-  },
-  traffic: {
-    type: Number,
-    default: 0, // ✅ traffic optional
-  },
+  from: { type: Number, required: true },
+  to: { type: Number, required: true },
+  distance: { type: Number, required: true },
+  traffic: { type: Number, default: 0 },
 });
 
 /* =========================
@@ -49,13 +28,16 @@ const graphSchema = new mongoose.Schema(
       type: String,
       default: "Untitled Graph",
     },
-
-    nodes: [nodeSchema],
-    edges: [edgeSchema],
+    nodes: {
+      type: [nodeSchema],
+      default: [],
+    },
+    edges: {
+      type: [edgeSchema],
+      default: [],
+    },
   },
-  {
-    timestamps: true, // ✅ adds createdAt & updatedAt
-  },
+  { timestamps: true },
 );
 
 export default mongoose.model("Graph", graphSchema);
