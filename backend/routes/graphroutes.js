@@ -4,16 +4,19 @@ import Graph from "../models/graph.js";
 const router = express.Router();
 
 /* =========================
-   SAVE OR UPDATE GRAPH
-   POST /api/graph/save
+   ROOT CHECK (IMPORTANT)
+========================= */
+router.get("/", (req, res) => {
+  res.json({ message: "Graph API is running 🚀" });
+});
+
+/* =========================
+   SAVE GRAPH
 ========================= */
 router.post("/save", async (req, res) => {
   try {
-    console.log("Incoming Data:", req.body);
-
     const { nodes, edges, name } = req.body;
 
-    // ✅ ALWAYS CREATE NEW GRAPH (NO OVERWRITE)
     const newGraph = new Graph({
       nodes,
       edges,
@@ -27,7 +30,6 @@ router.post("/save", async (req, res) => {
       graph: newGraph,
     });
   } catch (error) {
-    console.error("SAVE ERROR:", error);
     res.status(500).json({
       message: "Error saving graph",
       error: error.message,
@@ -36,7 +38,7 @@ router.post("/save", async (req, res) => {
 });
 
 /* =========================
-  LOAD LATEST GRAPH
+   LOAD LATEST GRAPH
 ========================= */
 router.get("/load", async (req, res) => {
   try {
@@ -56,7 +58,7 @@ router.get("/load", async (req, res) => {
 });
 
 /* =========================
-  RESET ALL GRAPHS
+   RESET ALL GRAPHS
 ========================= */
 router.delete("/reset", async (req, res) => {
   try {
@@ -71,7 +73,7 @@ router.delete("/reset", async (req, res) => {
 });
 
 /* =========================
-  GET ALL GRAPHS
+   GET ALL GRAPHS
 ========================= */
 router.get("/all", async (req, res) => {
   try {
@@ -86,7 +88,7 @@ router.get("/all", async (req, res) => {
 });
 
 /* =========================
-  DELETE GRAPH BY ID
+   DELETE GRAPH BY ID
 ========================= */
 router.delete("/:id", async (req, res) => {
   try {
