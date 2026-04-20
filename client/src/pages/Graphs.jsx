@@ -1,6 +1,11 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 
+// ✅ SAFE API (fallback added)
+const API =
+  import.meta.env.VITE_API_URL ||
+  "https://sro-mern-beh4g2exd2fhbpch.eastasia-01.azurewebsites.net";
+
 function Graphs() {
   const [graphs, setGraphs] = useState([]);
 
@@ -18,15 +23,18 @@ function Graphs() {
   };
 
   /* =========================
-     LOAD ALL GRAPHS ON PAGE OPEN
+     LOAD ALL GRAPHS
   ========================= */
   useEffect(() => {
     const loadGraphs = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/graph/all");
-        setGraphs(res.data);
+        const res = await axios.get(`${API}/api/graph/all`);
+
+        console.log("ALL GRAPHS:", res.data);
+
+        setGraphs(Array.isArray(res.data) ? res.data : []);
       } catch (error) {
-        console.error(error);
+        console.error("LOAD ERROR:", error);
         alert("Failed to load graphs");
       }
     };
@@ -35,17 +43,17 @@ function Graphs() {
   }, []);
 
   /* =========================
-     CLEAR ALL DATA (DB ONLY)
+     CLEAR ALL DATA
   ========================= */
   const clearAllGraphs = async () => {
     if (!window.confirm("Delete ALL graphs from database?")) return;
 
     try {
-      await axios.delete("http://localhost:5000/api/graph/reset");
+      await axios.delete(`${API}/api/graph/reset`);
       setGraphs([]);
       alert("All graphs deleted from DB");
     } catch (error) {
-      console.error(error);
+      console.error("DELETE ERROR:", error);
       alert("Failed to clear data");
     }
   };
@@ -103,7 +111,7 @@ function Graphs() {
 }
 
 /* =========================
-   STYLES (PREMIUM UI)
+   STYLES (UNCHANGED)
 ========================= */
 const styles = {
   container: {

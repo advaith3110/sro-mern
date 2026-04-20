@@ -3,7 +3,10 @@ import axios from "axios";
 import Node from "./Node";
 import { AppContext } from "../context/AppContext";
 
-const API = import.meta.env.VITE_API_URL || "http://localhost:5000";
+// ✅ ONLY CHANGE: force correct backend
+const API =
+  import.meta.env.VITE_API_URL ||
+  "https://sro-mern-beh4g2exd2fhbpch.eastasia-01.azurewebsites.net";
 
 function GraphCanvas() {
   const { nodes, setNodes, edges, setEdges, traffic } = useContext(AppContext);
@@ -28,15 +31,16 @@ function GraphCanvas() {
     return label;
   };
 
-  /* ========================= LOAD ========================= */
+  /* ========================= LOAD GRAPH ========================= */
   useEffect(() => {
     const loadGraph = async () => {
       try {
         const res = await axios.get(`${API}/api/graph/load`);
+        
 
         if (nodes.length === 0 && edges.length === 0) {
-          setNodes(res.data.nodes || []);
-          setEdges(res.data.edges || []);
+          setNodes(res.data?.nodes || []);
+          setEdges(res.data?.edges || []);
         }
       } catch (error) {
         console.log("Load Error:", error);
@@ -44,12 +48,13 @@ function GraphCanvas() {
     };
 
     loadGraph();
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line
   }, []);
 
-  /* ========================= SAVE ========================= */
+  /* ========================= SAVE GRAPH ========================= */
   const saveGraph = async () => {
+    console.log("SAVE CLICKED"); // debug
+
     try {
       await axios.post(`${API}/api/graph/save`, {
         nodes,
@@ -114,9 +119,7 @@ function GraphCanvas() {
           const trafficInput = prompt(
             "Enter Traffic Level (0 = no traffic, 5 = heavy)",
           );
-
           t = Number(trafficInput);
-
           if (isNaN(t) || t < 0) t = 0;
         }
 
@@ -167,7 +170,6 @@ function GraphCanvas() {
 
   return (
     <div style={styles.wrapper}>
-      {/* CONTROLS */}
       <div style={styles.panel}>
         <div style={styles.controls}>
           <button
@@ -202,7 +204,13 @@ function GraphCanvas() {
             🚀 Find shortest edge
           </button>
 
-          <button style={styles.save} onClick={saveGraph}>
+          <button
+            style={styles.save}
+            onClick={(e) => {
+              e.stopPropagation(); // 🔥 VERY IMPORTANT
+              saveGraph();
+            }}
+          >
             💾 Save
           </button>
 
@@ -212,12 +220,10 @@ function GraphCanvas() {
         </div>
       </div>
 
-      {/* DISTANCE */}
       {distance !== null && (
         <div style={styles.distance}>Shortest Edge Distance: {distance}</div>
       )}
 
-      {/* CANVAS */}
       <div style={styles.canvas} onClick={handleCanvasClick}>
         <svg style={styles.svg}>
           {edges.map((edge, i) => {
@@ -283,20 +289,13 @@ function GraphCanvas() {
 /* ========================= STYLES ========================= */
 const styles = {
   wrapper: { marginTop: "10px" },
-
-  panel: {
-    background: "#020617",
-    padding: "20px",
-    borderRadius: "16px",
-  },
-
+  panel: { background: "#020617", padding: "20px", borderRadius: "16px" },
   controls: {
     display: "flex",
     gap: "12px",
     flexWrap: "wrap",
     justifyContent: "center",
   },
-
   btn: {
     padding: "10px 16px",
     background: "#1e293b",
@@ -305,14 +304,12 @@ const styles = {
     border: "none",
     cursor: "pointer",
   },
-
   active: {
     padding: "10px 16px",
     background: "#22c55e",
     color: "white",
     borderRadius: "10px",
   },
-
   run: {
     padding: "10px 18px",
     background: "linear-gradient(135deg, #3b82f6, #06b6d4)",
@@ -321,7 +318,6 @@ const styles = {
     border: "none",
     cursor: "pointer",
   },
-
   save: {
     padding: "10px 16px",
     background: "#22c55e",
@@ -330,7 +326,6 @@ const styles = {
     border: "none",
     cursor: "pointer",
   },
-
   clear: {
     padding: "10px 16px",
     background: "#ef4444",
@@ -339,7 +334,6 @@ const styles = {
     border: "none",
     cursor: "pointer",
   },
-
   canvas: {
     width: "100%",
     height: "500px",
@@ -348,12 +342,7 @@ const styles = {
     position: "relative",
     marginTop: "15px",
   },
-
-  svg: {
-    width: "100%",
-    height: "100%",
-  },
-
+  svg: { width: "100%", height: "100%" },
   distance: {
     textAlign: "center",
     marginTop: "10px",
