@@ -7,7 +7,20 @@ import {
   Tooltip,
 } from "react-leaflet";
 import { useState } from "react";
+import L from "leaflet"; // ✅ ADD THIS
 import "leaflet/dist/leaflet.css";
+
+/* =========================
+   ✅ FIX FOR VERCEL MARKERS
+========================= */
+delete L.Icon.Default.prototype._getIconUrl;
+
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl:
+    "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
+  iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
+  shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+});
 
 /* =========================
    CLICK HANDLER
@@ -74,7 +87,6 @@ const dijkstra = (nodes, edges, start, end) => {
     });
   }
 
-  // build path
   const path = [];
   let curr = end;
 
@@ -97,16 +109,13 @@ function MapView() {
   const [path, setPath] = useState([]);
   const [distance, setDistance] = useState(null);
 
-  /* ADD NODE */
   const addNode = (coords) => {
     setNodes((prev) => [...prev, coords]);
   };
 
-  /* RUN DIJKSTRA */
   const calculateShortestPath = () => {
     if (nodes.length < 2) return;
 
-    // Create FULLY CONNECTED GRAPH
     const edges = [];
 
     for (let i = 0; i < nodes.length; i++) {
@@ -134,7 +143,6 @@ function MapView() {
 
         <ClickHandler addNode={addNode} />
 
-        {/* MARKERS WITH NUMBERS */}
         {nodes.map((pos, i) => (
           <Marker key={i} position={pos}>
             <Tooltip permanent direction="top">
@@ -143,7 +151,6 @@ function MapView() {
           </Marker>
         ))}
 
-        {/* SHORTEST PATH */}
         {path.length > 1 && (
           <Polyline
             positions={path}
@@ -155,12 +162,10 @@ function MapView() {
         )}
       </MapContainer>
 
-      {/* DISTANCE DISPLAY */}
       {distance && (
         <div style={styles.distance}>Shortest Distance: {distance} km</div>
       )}
 
-      {/* BUTTON */}
       <div style={styles.buttonWrapper}>
         <button style={styles.btn} onClick={calculateShortestPath}>
           🚀 Show Shortest Path
@@ -171,25 +176,22 @@ function MapView() {
 }
 
 /* =========================
-   STYLES
+   STYLES (UNCHANGED)
 ========================= */
 const styles = {
   wrapper: {
     marginTop: "30px",
     width: "100%",
   },
-
   map: {
     height: "400px",
     borderRadius: "15px",
   },
-
   buttonWrapper: {
     display: "flex",
     justifyContent: "center",
     marginTop: "20px",
   },
-
   btn: {
     padding: "14px 35px",
     borderRadius: "12px",
@@ -200,7 +202,6 @@ const styles = {
     cursor: "pointer",
     boxShadow: "0 0 20px rgba(0,255,255,0.5)",
   },
-
   distance: {
     textAlign: "center",
     marginTop: "15px",
