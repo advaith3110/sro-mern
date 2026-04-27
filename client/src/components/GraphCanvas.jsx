@@ -241,7 +241,7 @@ function GraphCanvas() {
 
       {distance !== null && (
         <div style={styles.distance}>
-          Shortest Edge Distance: {distance}
+          Shortest Path Distance: {distance}
         </div>
       )}
 
