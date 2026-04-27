@@ -3,7 +3,6 @@ import axios from "axios";
 import Node from "./Node";
 import { AppContext } from "../context/AppContext";
 
-// ✅ ONLY CHANGE: force correct backend
 const API =
   import.meta.env.VITE_API_URL ||
   "https://sro-mern-beh4g2exd2fhbpch.eastasia-01.azurewebsites.net";
@@ -20,7 +19,6 @@ function GraphCanvas() {
 
   const [mode, setMode] = useState("node");
 
-  /* ========================= LABEL ========================= */
   const getLabel = (id) => {
     let label = "";
     let i = id;
@@ -31,12 +29,10 @@ function GraphCanvas() {
     return label;
   };
 
-  /* ========================= LOAD GRAPH ========================= */
   useEffect(() => {
     const loadGraph = async () => {
       try {
         const res = await axios.get(`${API}/api/graph/load`);
-        
 
         if (nodes.length === 0 && edges.length === 0) {
           setNodes(res.data?.nodes || []);
@@ -51,16 +47,9 @@ function GraphCanvas() {
     // eslint-disable-next-line
   }, []);
 
-  /* ========================= SAVE GRAPH ========================= */
   const saveGraph = async () => {
-    console.log("SAVE CLICKED"); // debug
-
     try {
-      await axios.post(`${API}/api/graph/save`, {
-        nodes,
-        edges,
-      });
-
+      await axios.post(`${API}/api/graph/save`, { nodes, edges });
       alert("Graph Saved Successfully ✅");
     } catch (error) {
       console.log("Save Error:", error);
@@ -68,7 +57,6 @@ function GraphCanvas() {
     }
   };
 
-  /* ========================= CLEAR ========================= */
   const clearCanvas = () => {
     setNodes([]);
     setEdges([]);
@@ -78,7 +66,6 @@ function GraphCanvas() {
     setDistance(null);
   };
 
-  /* ========================= ADD NODE ========================= */
   const handleCanvasClick = (e) => {
     if (mode !== "node") return;
 
@@ -94,7 +81,6 @@ function GraphCanvas() {
     ]);
   };
 
-  /* ========================= NODE CLICK ========================= */
   const handleNodeClick = (node) => {
     if (mode === "start") {
       setStartNode(node.id);
@@ -116,9 +102,7 @@ function GraphCanvas() {
         let t = 0;
 
         if (traffic) {
-          const trafficInput = prompt(
-            "Enter Traffic Level (0 = no traffic, 5 = heavy)",
-          );
+          const trafficInput = prompt("Enter Traffic Level (0–5)");
           t = Number(trafficInput);
           if (isNaN(t) || t < 0) t = 0;
         }
@@ -138,34 +122,75 @@ function GraphCanvas() {
     }
   };
 
-  /* ========================= FIND MIN EDGE ========================= */
+  /* ========================= DIJKSTRA ========================= */
   const findMinimumEdge = () => {
-    if (edges.length === 0) {
-      alert("No edges available");
+    if (startNode === null || endNode === null) {
+      alert("Select start and end nodes");
       return;
     }
 
-    let minEdge = edges[0];
+    const distances = {};
+    const prev = {};
+    const visited = new Set();
 
-    edges.forEach((e) => {
-      const weight = traffic ? e.distance + (e.traffic || 0) : e.distance;
-
-      const currentWeight = traffic
-        ? minEdge.distance + (minEdge.traffic || 0)
-        : minEdge.distance;
-
-      if (weight < currentWeight) {
-        minEdge = e;
-      }
+    nodes.forEach((n) => {
+      distances[n.id] = Infinity;
+      prev[n.id] = null;
     });
 
-    setHighlightNodes([minEdge.from, minEdge.to]);
+    distances[startNode] = 0;
 
-    const finalDistance = traffic
-      ? minEdge.distance + (minEdge.traffic || 0)
-      : minEdge.distance;
+    while (true) {
+      let current = null;
 
-    setDistance(finalDistance);
+      nodes.forEach((n) => {
+        if (!visited.has(n.id)) {
+          if (current === null || distances[n.id] < distances[current]) {
+            current = n.id;
+          }
+        }
+      });
+
+      if (current === null) break;
+      if (current === endNode) break;
+
+      visited.add(current);
+
+      edges.forEach((e) => {
+        if (e.from === current || e.to === current) {
+          const neighbor = e.from === current ? e.to : e.from;
+
+          if (visited.has(neighbor)) return;
+
+          const weight = traffic
+            ? e.distance + (e.traffic || 0)
+            : e.distance;
+
+          const newDist = distances[current] + weight;
+
+          if (newDist < distances[neighbor]) {
+            distances[neighbor] = newDist;
+            prev[neighbor] = current;
+          }
+        }
+      });
+    }
+
+    let path = [];
+    let curr = endNode;
+
+    while (curr !== null) {
+      path.unshift(curr);
+      curr = prev[curr];
+    }
+
+    if (path.length === 1) {
+      alert("No path found");
+      return;
+    }
+
+    setHighlightNodes(path);
+    setDistance(distances[endNode]);
   };
 
   return (
@@ -204,13 +229,7 @@ function GraphCanvas() {
             🚀 Find shortest edge
           </button>
 
-          <button
-            style={styles.save}
-            onClick={(e) => {
-              e.stopPropagation(); // 🔥 VERY IMPORTANT
-              saveGraph();
-            }}
-          >
+          <button style={styles.save} onClick={saveGraph}>
             💾 Save
           </button>
 
@@ -221,7 +240,9 @@ function GraphCanvas() {
       </div>
 
       {distance !== null && (
-        <div style={styles.distance}>Shortest Edge Distance: {distance}</div>
+        <div style={styles.distance}>
+          Shortest Edge Distance: {distance}
+        </div>
       )}
 
       <div style={styles.canvas} onClick={handleCanvasClick}>
@@ -232,11 +253,8 @@ function GraphCanvas() {
             if (!from || !to) return null;
 
             const isHighlight =
-              highlightNodes.length === 2 &&
-              ((edge.from === highlightNodes[0] &&
-                edge.to === highlightNodes[1]) ||
-                (edge.from === highlightNodes[1] &&
-                  edge.to === highlightNodes[0]));
+              highlightNodes.includes(edge.from) &&
+              highlightNodes.includes(edge.to);
 
             const weight = traffic
               ? edge.distance + (edge.traffic || 0)
@@ -252,7 +270,6 @@ function GraphCanvas() {
                   stroke={isHighlight ? "#22c55e" : "#64748b"}
                   strokeWidth={isHighlight ? 4 : 2}
                 />
-
                 <text
                   x={(from.x + to.x) / 2}
                   y={(from.y + to.y) / 2}
@@ -286,7 +303,6 @@ function GraphCanvas() {
   );
 }
 
-/* ========================= STYLES ========================= */
 const styles = {
   wrapper: { marginTop: "10px" },
   panel: { background: "#020617", padding: "20px", borderRadius: "16px" },
@@ -302,7 +318,6 @@ const styles = {
     color: "#cbd5f5",
     borderRadius: "10px",
     border: "none",
-    cursor: "pointer",
   },
   active: {
     padding: "10px 16px",
@@ -316,7 +331,6 @@ const styles = {
     color: "white",
     borderRadius: "10px",
     border: "none",
-    cursor: "pointer",
   },
   save: {
     padding: "10px 16px",
@@ -324,7 +338,6 @@ const styles = {
     color: "white",
     borderRadius: "10px",
     border: "none",
-    cursor: "pointer",
   },
   clear: {
     padding: "10px 16px",
@@ -332,7 +345,6 @@ const styles = {
     color: "white",
     borderRadius: "10px",
     border: "none",
-    cursor: "pointer",
   },
   canvas: {
     width: "100%",
