@@ -85,25 +85,28 @@ function Graphs() {
         <p style={styles.empty}>No saved graphs found</p>
       ) : (
         <div style={styles.grid}>
-          {graphs.map((g, i) => (
-            <div key={g._id} style={styles.card}>
-              <h3 style={styles.cardTitle}>Graph #{i + 1}</h3>
+          {graphs
+            .slice()
+            .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
+            .map((g, i) => (
+              <div key={g._id} style={styles.card}>
+                <h3 style={styles.cardTitle}>Graph #{i + 1}</h3>
 
-              <p style={styles.date}>Created: {formatDate(g.createdAt)}</p>
+                <p style={styles.date}>Created: {formatDate(g.createdAt)}</p>
 
-              <p>Total Nodes: {g.nodes.length}</p>
-              <p>Total Edges: {g.edges.length}</p>
+                <p>Total Nodes: {g.nodes.length}</p>
+                <p>Total Edges: {g.edges.length}</p>
 
-              <div style={styles.edgesBox}>
-                {g.edges.map((e, idx) => (
-                  <div key={idx} style={styles.edge}>
-                    {getLabel(e.from)} → {getLabel(e.to)} | Distance:{" "}
-                    {e.distance} | Traffic: {e.traffic || 0}
-                  </div>
-                ))}
+                <div style={styles.edgesBox}>
+                  {g.edges.map((e, idx) => (
+                    <div key={idx} style={styles.edge}>
+                      {getLabel(e.from)} → {getLabel(e.to)} | Distance:{" "}
+                      {e.distance} | Traffic: {e.traffic || 0}
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
         </div>
       )}
     </div>
