@@ -11,7 +11,7 @@ router.get("/", (req, res) => {
 });
 
 /* =========================
-   SAVE GRAPH (FIXED)
+   SAVE GRAPH
 ========================= */
 router.post("/save", async (req, res) => {
   try {
@@ -19,7 +19,6 @@ router.post("/save", async (req, res) => {
 
     const { nodes, edges } = req.body;
 
-    // ✅ VALIDATION (IMPORTANT)
     if (!Array.isArray(nodes) || !Array.isArray(edges)) {
       return res.status(400).json({
         message: "Invalid data format",
@@ -85,11 +84,11 @@ router.delete("/reset", async (req, res) => {
 });
 
 /* =========================
-   GET ALL
+   GET ALL (FIXED ORDER)
 ========================= */
 router.get("/all", async (req, res) => {
   try {
-    const graphs = await Graph.find().sort({ createdAt: -1 });
+    const graphs = await Graph.find().sort({ createdAt: 1 }); // ✅ FIXED
     res.json(graphs);
   } catch (error) {
     res.status(500).json({
