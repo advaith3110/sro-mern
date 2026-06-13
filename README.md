@@ -1,1 +1,2 @@
-https://sro-mern.vercel.app/
+Frontend :https://sro-mern.vercel.app/
+Backend :https://portal.azure.com/?Microsoft_Azure_Education_correlationId=54224e31-4c17-4686-b507-4f3495a61db5&Microsoft_Azure_Education_newA4E=true&Microsoft_Azure_Education_asoSubGuid=cd4b3e52-420e-44e2-9308-30a70140fae1#@stu.pes.edu/resource/subscriptions/cd4b3e52-420e-44e2-9308-30a70140fae1/resourceGroups/default/providers/Microsoft.Web/sites/SRO-MERN/appServices
